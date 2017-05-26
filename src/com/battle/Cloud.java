@@ -3,36 +3,36 @@ package com.battle;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-//ÔÆ(µÀ¾ß)Àà
+//äº‘(é“å…·)ç±»
 public class Cloud {
-	private Bitmap cloudBitmap;    //ÔÆ(µÀ¾ß)Í¼
-	private int cloudX;            //ÔÆ(µÀ¾ß)×ø±ê
-	private int cloudY;
-	private int cloudSpeed=6;      //ÔÆ(µÀ¾ß)ÒÆ¶¯ËÙ¶È
-	
-	Cloud(Bitmap cloudBitmap,int cloudX,int cloudY){
-		this.cloudBitmap=cloudBitmap;
-		this.cloudX=cloudX;
-		this.cloudY=cloudY;
-	}
-	
-	//»æÖÆÔÆ(µÀ¾ß)
-	public void drawCloud(Canvas canvas){
-		canvas.drawBitmap(cloudBitmap, cloudX, cloudY, null);
-	}
-	
-	//ÒÆ¶¯ÔÆ(µÀ¾ß)
-	public void moveCloud(){
-		cloudY+=cloudSpeed;
-	}
-	
-	//»ñÈ¡ÔÆ(µÀ¾ß)ºá×ø±ê
-	public int getCloudX(){
-		return cloudX;
-	}
-	
-	//»ñÈ¡ÔÆ(µÀ¾ß)×İ×ø±ê
-	public int getCloudY(){
-		return cloudY;
-	}
+    private Bitmap cloudBitmap;    //äº‘(é“å…·)å›¾
+    private int cloudX;            //äº‘(é“å…·)åæ ‡
+    private int cloudY;
+    private int cloudSpeed=6;      //äº‘(é“å…·)ç§»åŠ¨é€Ÿåº¦
+    
+    Cloud(Bitmap cloudBitmap,int cloudX,int cloudY){
+        this.cloudBitmap=cloudBitmap;
+        this.cloudX=cloudX;
+        this.cloudY=cloudY;
+    }
+    
+    //ç»˜åˆ¶äº‘(é“å…·)
+    public void drawCloud(Canvas canvas){
+        canvas.drawBitmap(cloudBitmap, cloudX, cloudY, null);
+    }
+    
+    //ç§»åŠ¨äº‘(é“å…·)
+    public void moveCloud(){
+        cloudY+=cloudSpeed;
+    }
+    
+    //è·å–äº‘(é“å…·)æ¨ªåæ ‡
+    public int getCloudX(){
+        return cloudX;
+    }
+    
+    //è·å–äº‘(é“å…·)çºµåæ ‡
+    public int getCloudY(){
+        return cloudY;
+    }
 }

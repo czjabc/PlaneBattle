@@ -16,7 +16,6 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -25,710 +24,710 @@ import android.view.SurfaceView;
 
 public class PlaneBattleActivity extends Activity {
     /** Called when the activity is first created. */
-	
-	private SurfaceView battleSurfaceView;                            //surfaceview»æÍ¼ÈİÆ÷
-	private Handler handler=new Handler();                            //½ÓÊÕ»æÍ¼Ïß³Ì·¢ËÍµÄÊı¾İ£¬¸üĞÂUI
-	private int refreshTime=30;                                       //ÓÎÏ·»­ÃæË¢ĞÂÊ±¼ä¼ä¸ô
-	
-	private boolean isPaused=false;                                   //ÓÎÏ·ÊÇ·ñÔİÍ£
-	private boolean flag=true;                                		  //ÓÎÏ·»æÍ¼Ïß³ÌÖ÷Ñ­»·ÊÇ·ñÕıÔÚ½øĞĞ
-	private boolean isFirstLoad=true;                                 //ÓÎÏ·ÊÇ·ñÊ×´Î¼ÓÔØ
-	
-	private int score=0;                                              //Íæ¼ÒµÃ·Ö
-	
-	private int playerX, playerY;                                     //Íæ¼Ò·É»úµÄ×ø±ê
-	private int skyY=0;                                               //Ìì¿Õ±³¾°Í¼µÄ×óÉÏ½ÇµÄy×ø±ê£¬x×ø±êÒ»Ö±Îª0
-	private int eventX,eventY;                                        //´¥ÆÁ½Ó´¥µãµÄ×ø±ê
-	private int dx,dy;                                                //´¥ÆÁ½Ó´¥µãµÄÎ»ÒÆ
-	private int noticeX,noticeY;                                      //µĞ»úÈº¹¥ÌáÊ¾Í¼Æ¬×óÉÏ½ÇµÄ×ø±ê
-	private int scoreAddingX,scoreAddingY;                            //µÀ¾ß¼Ó·ÖĞ§¹ûÍ¼Æ¬×óÉÏ½ÇµÄ×ø±ê
-	
-	private int screenWidth, screenHeight;                            //ÆÁÄ»¿í¸ß
-	private int skyBitmapHeight,skyBitmapWidth;                       //Ìì¿ÕÍ¼Æ¬µÄ¿í¸ß
-	private int playerBitmapWidth, playerBitmapHeight;                //Íæ¼Ò·É»úÍ¼Æ¬µÄ¿í¸ß
-	private int bulletBitmapWidth, bulletBitmapHeight;                //Õ¨µ¯Í¼Æ¬µÄ¿í¸ß
-	private int enemyBitmapWidth, enemyBitmapHeight;                  //Ğ¡ĞÍµĞ»úÍ¼Æ¬µÄ¿í¸ß
-	private int enemyMBitmapWidth, enemyMBitmapHeight;                //ÖĞĞÍµĞ»úµÄ¿í¸ß      
-	private int enemyLBitmapWidth, enemyLBitmapHeight;                //´óĞÍµĞ»úµÄ¿í¸ß
-	private int cloudBitmapWidth,cloudBitmapHeight;                   //ÔÆ(µÀ¾ß)Í¼Æ¬µÄ¿í¸ß
-	private int scoreAddingBitmapWidth,scoreAddingBitmapHeight;       //µÀ¾ß¼Ó·ÖĞ§¹ûÍ¼Æ¬µÄ¿í¸ß
-	
-	private Player player=null;                                       //Íæ¼Ò·É»ú
-	private ArrayList<Bullet> bulletArray=new ArrayList<Bullet>();    //Êı×é´æ´¢ËùÓĞÆÁÄ»ÉÏÏÔÊ¾µÄÕ¨µ¯¶ÔÏó
-	private ArrayList<Enemy> enemyArray=new ArrayList<Enemy>();       //Êı×é´æ´¢ËùÓĞÆÁÄ»ÉÏÏÔÊ¾µÄµĞ»ú¶ÔÏó
-	private ArrayList<Cloud> cloudArray=new ArrayList<Cloud>();       //Êı×é´æ´¢ËùÓĞÆÁÄ»ÉÏÏÔÊ¾µÄÔÆ(µÀ¾ß)¶ÔÏó
-	
-	private long createBulletTime;                                    //´´½¨Õ¨µ¯µÄÊ±¼ä
-	private long createCloudTime;                                     //´´½¨ÔÆ(µÀ¾ß)µÄÊ±¼ä
-	private long createEnemyTime,createEnemyMTime,createEnemyLTime;   //´´½¨µĞ»úµÄÊ±¼ä
-	private long gameTimeNow;                                         //»æÍ¼Ïß³ÌÖ÷Ñ­»·Ã¿Ò»ÂÖµÄ¿ªÊ¼Ê±¼ä
-	
-	private boolean isPlayerLocked=false;                             //Íæ¼Ò·É»úÊÇ·ñ±»µãÖĞ(ÔÚ´¥ÆÁÊÂ¼şÖĞ)
-	private boolean isDoubleBullet=false;                             //Ë«±¶Õ¨µ¯ÊÇ·ñ¿ªÆô
-	private boolean isEnemiesComing=false;                            //µĞ»úÈº¹¥ÊÇ·ñ¿ªÆô
-	private boolean isNoticeShowing=false;                            //µĞ»úÈº¹¥ÌáÊ¾ÊÇ·ñÕ¹Ê¾
-	private boolean isScoreAdding=false;                              //µÀ¾ß¼Ó·ÖÊÇ·ñ»ñµÃ
-	
-	private int doubleBulletCount;                                    //Ë«±¶Õ¨µ¯µÄ·¢Éä´ÎÊı
-	private int noticeCount;                                          //µĞ»úÈº¹¥ÌáÊ¾Í¼Æ¬µÄË¢ĞÂ´ÎÊı
-	private int scoreAddingCount;                                     //µÀ¾ß¼Ó·ÖĞ§¹ûÍ¼Æ¬µÄË¢ĞÂ´ÎÊı
-	
-		
+    
+    private SurfaceView battleSurfaceView;                            //surfaceviewç»˜å›¾å®¹å™¨
+    private Handler handler=new Handler();                            //æ¥æ”¶ç»˜å›¾çº¿ç¨‹å‘é€çš„æ•°æ®ï¼Œæ›´æ–°UI
+    private int refreshTime=30;                                       //æ¸¸æˆç”»é¢åˆ·æ–°æ—¶é—´é—´éš”
+    
+    private boolean isPaused=false;                                   //æ¸¸æˆæ˜¯å¦æš‚åœ
+    private boolean flag=true;                                        //æ¸¸æˆç»˜å›¾çº¿ç¨‹ä¸»å¾ªç¯æ˜¯å¦æ­£åœ¨è¿›è¡Œ
+    private boolean isFirstLoad=true;                                 //æ¸¸æˆæ˜¯å¦é¦–æ¬¡åŠ è½½
+    
+    private int score=0;                                              //ç©å®¶å¾—åˆ†
+    
+    private int playerX, playerY;                                     //ç©å®¶é£æœºçš„åæ ‡
+    private int skyY=0;                                               //å¤©ç©ºèƒŒæ™¯å›¾çš„å·¦ä¸Šè§’çš„yåæ ‡ï¼Œxåæ ‡ä¸€ç›´ä¸º0
+    private int eventX,eventY;                                        //è§¦å±æ¥è§¦ç‚¹çš„åæ ‡
+    private int dx,dy;                                                //è§¦å±æ¥è§¦ç‚¹çš„ä½ç§»
+    private int noticeX,noticeY;                                      //æ•Œæœºç¾¤æ”»æç¤ºå›¾ç‰‡å·¦ä¸Šè§’çš„åæ ‡
+    private int scoreAddingX,scoreAddingY;                            //é“å…·åŠ åˆ†æ•ˆæœå›¾ç‰‡å·¦ä¸Šè§’çš„åæ ‡
+    
+    private int screenWidth, screenHeight;                            //å±å¹•å®½é«˜
+    private int skyBitmapHeight,skyBitmapWidth;                       //å¤©ç©ºå›¾ç‰‡çš„å®½é«˜
+    private int playerBitmapWidth, playerBitmapHeight;                //ç©å®¶é£æœºå›¾ç‰‡çš„å®½é«˜
+    private int bulletBitmapWidth, bulletBitmapHeight;                //ç‚¸å¼¹å›¾ç‰‡çš„å®½é«˜
+    private int enemyBitmapWidth, enemyBitmapHeight;                  //å°å‹æ•Œæœºå›¾ç‰‡çš„å®½é«˜
+    private int enemyMBitmapWidth, enemyMBitmapHeight;                //ä¸­å‹æ•Œæœºçš„å®½é«˜      
+    private int enemyLBitmapWidth, enemyLBitmapHeight;                //å¤§å‹æ•Œæœºçš„å®½é«˜
+    private int cloudBitmapWidth,cloudBitmapHeight;                   //äº‘(é“å…·)å›¾ç‰‡çš„å®½é«˜
+    private int scoreAddingBitmapWidth,scoreAddingBitmapHeight;       //é“å…·åŠ åˆ†æ•ˆæœå›¾ç‰‡çš„å®½é«˜
+    
+    private Player player=null;                                       //ç©å®¶é£æœº
+    private ArrayList<Bullet> bulletArray=new ArrayList<Bullet>();    //æ•°ç»„å­˜å‚¨æ‰€æœ‰å±å¹•ä¸Šæ˜¾ç¤ºçš„ç‚¸å¼¹å¯¹è±¡
+    private ArrayList<Enemy> enemyArray=new ArrayList<Enemy>();       //æ•°ç»„å­˜å‚¨æ‰€æœ‰å±å¹•ä¸Šæ˜¾ç¤ºçš„æ•Œæœºå¯¹è±¡
+    private ArrayList<Cloud> cloudArray=new ArrayList<Cloud>();       //æ•°ç»„å­˜å‚¨æ‰€æœ‰å±å¹•ä¸Šæ˜¾ç¤ºçš„äº‘(é“å…·)å¯¹è±¡
+    
+    private long createBulletTime;                                    //åˆ›å»ºç‚¸å¼¹çš„æ—¶é—´
+    private long createCloudTime;                                     //åˆ›å»ºäº‘(é“å…·)çš„æ—¶é—´
+    private long createEnemyTime,createEnemyMTime,createEnemyLTime;   //åˆ›å»ºæ•Œæœºçš„æ—¶é—´
+    private long gameTimeNow;                                         //ç»˜å›¾çº¿ç¨‹ä¸»å¾ªç¯æ¯ä¸€è½®çš„å¼€å§‹æ—¶é—´
+    
+    private boolean isPlayerLocked=false;                             //ç©å®¶é£æœºæ˜¯å¦è¢«ç‚¹ä¸­(åœ¨è§¦å±äº‹ä»¶ä¸­)
+    private boolean isDoubleBullet=false;                             //åŒå€ç‚¸å¼¹æ˜¯å¦å¼€å¯
+    private boolean isEnemiesComing=false;                            //æ•Œæœºç¾¤æ”»æ˜¯å¦å¼€å¯
+    private boolean isNoticeShowing=false;                            //æ•Œæœºç¾¤æ”»æç¤ºæ˜¯å¦å±•ç¤º
+    private boolean isScoreAdding=false;                              //é“å…·åŠ åˆ†æ˜¯å¦è·å¾—
+    
+    private int doubleBulletCount;                                    //åŒå€ç‚¸å¼¹çš„å‘å°„æ¬¡æ•°
+    private int noticeCount;                                          //æ•Œæœºç¾¤æ”»æç¤ºå›¾ç‰‡çš„åˆ·æ–°æ¬¡æ•°
+    private int scoreAddingCount;                                     //é“å…·åŠ åˆ†æ•ˆæœå›¾ç‰‡çš„åˆ·æ–°æ¬¡æ•°
+    
+        
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        //»ñÈ¡ÆÁÄ»¿í¸ß
+        //è·å–å±å¹•å®½é«˜
         DisplayMetrics dm=getResources().getDisplayMetrics();
         screenWidth=dm.widthPixels;
         screenHeight=dm.heightPixels;
         
-        //»ñÈ¡×÷Õ½Ö÷Ò³ÃæµÄsurfaceview¿Ø¼ş
+        //è·å–ä½œæˆ˜ä¸»é¡µé¢çš„surfaceviewæ§ä»¶
         battleSurfaceView=(SurfaceView)findViewById(R.id.battle_surfaceView);
         battleSurfaceView.getHolder().addCallback(callback);
     }
     
     private Callback callback=new Callback(){
 
-		@Override
-		public void surfaceChanged(SurfaceHolder holder, int format, int width,
-				int height) {
-			System.out.println("surfaceChanged");
-		}
+        @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int width,
+                int height) {
+            System.out.println("surfaceChanged");
+        }
 
-		@Override
-		public void surfaceCreated(SurfaceHolder holder) {
-			System.out.println("surfaceCreated");
-			new BattleThread(holder).start();
-		}
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            System.out.println("surfaceCreated");
+            new BattleThread(holder).start();
+        }
 
-		@Override
-		public void surfaceDestroyed(SurfaceHolder holder) {
-			//½áÊøÏß³ÌÖĞµÄÑ­»·
-			System.out.println("surfaceDestroyed");
-			flag=false;
-		}
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            //ç»“æŸçº¿ç¨‹ä¸­çš„å¾ªç¯
+            System.out.println("surfaceDestroyed");
+            flag=false;
+        }
     };
     
     class BattleThread extends Thread{
-    	
-    	SurfaceHolder holder;
-    	
-    	public BattleThread(SurfaceHolder holder){
-    		this.holder=holder;
-    	}
+        
+        SurfaceHolder holder;
+        
+        public BattleThread(SurfaceHolder holder){
+            this.holder=holder;
+        }
 
-		@Override
-		public void run() {
-			super.run();
-			
-			//¼ÓÔØÍ¼Æ¬
-			Bitmap skyBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.sky);
-			Bitmap bulletBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.bullet);
-			Bitmap playerBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.player);			
-			Bitmap playerBombBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.player_bomb);
-			Bitmap cloudBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.cloud);
-			Bitmap cloudBombBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.cloud_bomb);
-			Bitmap scoreAddingBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.score_add);
-			
-			//´´½¨µĞ»úÍ¼Êı×é
-			ArrayList<Bitmap> enemyBitmapArray=new ArrayList<Bitmap>();
-			enemyBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy));
-			enemyBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_m));
-			enemyBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_l));
-			
-			//´´½¨µĞ»ú±¬Õ¨Ğ§¹ûÍ¼Êı×é
-			ArrayList<Bitmap> enemyBombBitmapArray=new ArrayList<Bitmap>();
-			enemyBombBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_bomb));
-			enemyBombBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_m_bomb));
-			enemyBombBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_l_bomb));
-			
-			//´´½¨µĞ»úÈº¹¥ÌáÊ¾Í¼Êı×é
-			ArrayList<Bitmap> noticeBitmapArray=new ArrayList<Bitmap>();
-			noticeBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_coming0));
-			noticeBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_coming1));
-			noticeBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_coming2));
-			//µĞ»úÈº¹¥ÌáÊ¾Í¼µÄË¢ĞÂĞòÁĞ
+        @Override
+        public void run() {
+            super.run();
+            
+            //åŠ è½½å›¾ç‰‡
+            Bitmap skyBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.sky);
+            Bitmap bulletBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.bullet);
+            Bitmap playerBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.player);            
+            Bitmap playerBombBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.player_bomb);
+            Bitmap cloudBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.cloud);
+            Bitmap cloudBombBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.cloud_bomb);
+            Bitmap scoreAddingBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.score_add);
+            
+            //åˆ›å»ºæ•Œæœºå›¾æ•°ç»„
+            ArrayList<Bitmap> enemyBitmapArray=new ArrayList<Bitmap>();
+            enemyBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy));
+            enemyBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_m));
+            enemyBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_l));
+            
+            //åˆ›å»ºæ•Œæœºçˆ†ç‚¸æ•ˆæœå›¾æ•°ç»„
+            ArrayList<Bitmap> enemyBombBitmapArray=new ArrayList<Bitmap>();
+            enemyBombBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_bomb));
+            enemyBombBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_m_bomb));
+            enemyBombBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_l_bomb));
+            
+            //åˆ›å»ºæ•Œæœºç¾¤æ”»æç¤ºå›¾æ•°ç»„
+            ArrayList<Bitmap> noticeBitmapArray=new ArrayList<Bitmap>();
+            noticeBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_coming0));
+            noticeBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_coming1));
+            noticeBitmapArray.add(BitmapFactory.decodeResource(getResources(), R.drawable.enemy_coming2));
+            //æ•Œæœºç¾¤æ”»æç¤ºå›¾çš„åˆ·æ–°åºåˆ—
             int noticeSequence[]={0,0,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
             
             if(isFirstLoad){
-				//µĞ»úÈº¹¥ÌáÊ¾Í¼Ë¢ĞÂ´ÎÊı
-				noticeCount=noticeSequence.length;
-				
-				//»ñÈ¡Í¼Æ¬¿í¸ß
-				skyBitmapHeight=skyBitmap.getHeight();
-				skyBitmapWidth=skyBitmap.getWidth();
-				playerBitmapWidth=playerBitmap.getWidth();
-				playerBitmapHeight=playerBitmap.getHeight();
-				bulletBitmapWidth=bulletBitmap.getWidth();
-				bulletBitmapHeight=bulletBitmap.getHeight();
-				enemyBitmapWidth=enemyBitmapArray.get(0).getWidth();
-				enemyBitmapHeight=enemyBitmapArray.get(0).getHeight();
-				enemyMBitmapWidth=enemyBitmapArray.get(1).getWidth();
-				enemyMBitmapHeight=enemyBitmapArray.get(1).getHeight();
-				enemyLBitmapWidth=enemyBitmapArray.get(2).getWidth();
-				enemyLBitmapHeight=enemyBitmapArray.get(2).getHeight();
-				cloudBitmapWidth=cloudBitmap.getWidth();
-				cloudBitmapHeight=cloudBitmap.getHeight();
-				scoreAddingBitmapWidth=scoreAddingBitmap.getWidth();
-				scoreAddingBitmapHeight=scoreAddingBitmap.getHeight();
-				
-				//»ñÈ¡Íæ¼Ò·É»úÆğÊ¼×ø±ê
-				playerX=screenWidth/2-playerBitmapWidth/2;
-				playerY=screenHeight-playerBitmapHeight;
-				
-				//»ñÈ¡µĞ»úÈº¹¥ÌáÊ¾Í¼×ø±ê
-	            noticeX=screenWidth/2-noticeBitmapArray.get(0).getWidth()/2;
-	            noticeY=screenHeight/2-noticeBitmapArray.get(0).getHeight()/2;
-	         
-				//´´½¨Íæ¼Ò·É»ú¶ÔÏó
-				player=new Player(playerBitmap);
-				
-				//³õÊ¼»¯´´½¨¸÷ÀàÓÎÏ·ÔªËØµÄÊ±¼ä
-				createBulletTime=createEnemyTime=createEnemyMTime=createEnemyLTime=
-				createCloudTime=System.currentTimeMillis();
-				
-				//¸ù¾İÆÁ¸ßÉèÖÃ»­ÃæË¢ĞÂµÄÊ±¼ä¼ä¸ô
-				//±ê×¼Ä£Ê½ÊÇ800ÆÁ¸ß,40msË¢ĞÂÊ±¼ä¼ä¸ô
-				refreshTime=32000/screenHeight;
-				
-				//ÉèÖÃÎª·ÇÊ×´Î¼ÓÔØ
-				isFirstLoad=false;
+                //æ•Œæœºç¾¤æ”»æç¤ºå›¾åˆ·æ–°æ¬¡æ•°
+                noticeCount=noticeSequence.length;
+                
+                //è·å–å›¾ç‰‡å®½é«˜
+                skyBitmapHeight=skyBitmap.getHeight();
+                skyBitmapWidth=skyBitmap.getWidth();
+                playerBitmapWidth=playerBitmap.getWidth();
+                playerBitmapHeight=playerBitmap.getHeight();
+                bulletBitmapWidth=bulletBitmap.getWidth();
+                bulletBitmapHeight=bulletBitmap.getHeight();
+                enemyBitmapWidth=enemyBitmapArray.get(0).getWidth();
+                enemyBitmapHeight=enemyBitmapArray.get(0).getHeight();
+                enemyMBitmapWidth=enemyBitmapArray.get(1).getWidth();
+                enemyMBitmapHeight=enemyBitmapArray.get(1).getHeight();
+                enemyLBitmapWidth=enemyBitmapArray.get(2).getWidth();
+                enemyLBitmapHeight=enemyBitmapArray.get(2).getHeight();
+                cloudBitmapWidth=cloudBitmap.getWidth();
+                cloudBitmapHeight=cloudBitmap.getHeight();
+                scoreAddingBitmapWidth=scoreAddingBitmap.getWidth();
+                scoreAddingBitmapHeight=scoreAddingBitmap.getHeight();
+                
+                //è·å–ç©å®¶é£æœºèµ·å§‹åæ ‡
+                playerX=screenWidth/2-playerBitmapWidth/2;
+                playerY=screenHeight-playerBitmapHeight;
+                
+                //è·å–æ•Œæœºç¾¤æ”»æç¤ºå›¾åæ ‡
+                noticeX=screenWidth/2-noticeBitmapArray.get(0).getWidth()/2;
+                noticeY=screenHeight/2-noticeBitmapArray.get(0).getHeight()/2;
+             
+                //åˆ›å»ºç©å®¶é£æœºå¯¹è±¡
+                player=new Player(playerBitmap);
+                
+                //åˆå§‹åŒ–åˆ›å»ºå„ç±»æ¸¸æˆå…ƒç´ çš„æ—¶é—´
+                createBulletTime=createEnemyTime=createEnemyMTime=createEnemyLTime=
+                createCloudTime=System.currentTimeMillis();
+                
+                //æ ¹æ®å±é«˜è®¾ç½®ç”»é¢åˆ·æ–°çš„æ—¶é—´é—´éš”
+                //æ ‡å‡†æ¨¡å¼æ˜¯800å±é«˜,40msåˆ·æ–°æ—¶é—´é—´éš”
+                refreshTime=32000/screenHeight;
+                
+                //è®¾ç½®ä¸ºéé¦–æ¬¡åŠ è½½
+                isFirstLoad=false;
             }
-			
-			//»æÍ¼Ö÷Ñ­»·
-			while(flag){
-								
-				//¿ØÖÆ»­ÃæË¢ĞÂµÄÊ±¼ä¼ä¸ô
-				if(System.currentTimeMillis()-gameTimeNow<refreshTime)continue;
-				//Log.v("time", System.currentTimeMillis()+"");
-				
-				//¼ÇÂ¼µ±Ç°ÂÖ¿ªÊ¼Ê±¼ä
-				gameTimeNow=System.currentTimeMillis();
-				
-				if(!isPaused){
-					
-					//Ëø¶¨»­²¼£¬¿ªÊ¼»æÍ¼
-					Canvas canvas=holder.lockCanvas();
-					//»æÖÆÌì¿Õ±³¾°
-					drawSky(skyBitmap,canvas);					
-					//Íæ¼Ò·É»úÓëÔÆ(µÀ¾ß)µÄÅö×²¼ì²â
-					playerHitCloud(cloudBombBitmap,canvas);
-					//Õ¨µ¯ÓëµĞ»úµÄÅö×²¼ì²â
-					bulletHitEnemy(enemyBombBitmapArray,canvas);
-					//µĞ»úÓëÍæ¼Ò·É»úµÄÅö×²¼ì²â
-					if(!enemyHitPlayer(playerBombBitmap,canvas))
-						//»æÖÆÍæ¼Ò·É»ú
-						drawPlayer(playerBitmap,canvas);
-					//»æÖÆÕ¨µ¯
-					drawBullet(bulletBitmap,canvas);
-					//»æÖÆµĞ»ú
-					drawEnemy(enemyBitmapArray,canvas);
-					//»æÖÆÔÆ(µÀ¾ß)
-					drawCloud(cloudBitmap,canvas);
-					//»æÖÆ·ÖÊı
-					drawScore(canvas);
-					//ÅĞ¶ÏµĞ»úÈº¹¥ÌáÊ¾ÊÇ·ñÕ¹Ê¾£¬ÊÇÔò»æÖÆÌáÊ¾
-					if(isNoticeShowing)drawNotice(noticeBitmapArray,noticeSequence,canvas);
-					//ÅĞ¶ÏµÀ¾ß¼Ó·ÖÊÇ·ñ»ñµÃ£¬ÊÇÔò»æÖÆ¼Ó·ÖĞ§¹û
-					if(isScoreAdding)drawScoreAdding(scoreAddingBitmap,canvas);
-					//½âËø»­²¼£¬Ìá½»¸üĞÂ
-					holder.unlockCanvasAndPost(canvas);
-				}			
-			}
-		}   	   	
+            
+            //ç»˜å›¾ä¸»å¾ªç¯
+            while(flag){
+                                
+                //æ§åˆ¶ç”»é¢åˆ·æ–°çš„æ—¶é—´é—´éš”
+                if(System.currentTimeMillis()-gameTimeNow<refreshTime)continue;
+                //Log.v("time", System.currentTimeMillis()+"");
+                
+                //è®°å½•å½“å‰è½®å¼€å§‹æ—¶é—´
+                gameTimeNow=System.currentTimeMillis();
+                
+                if(!isPaused){
+                    
+                    //é”å®šç”»å¸ƒï¼Œå¼€å§‹ç»˜å›¾
+                    Canvas canvas=holder.lockCanvas();
+                    //ç»˜åˆ¶å¤©ç©ºèƒŒæ™¯
+                    drawSky(skyBitmap,canvas);                  
+                    //ç©å®¶é£æœºä¸äº‘(é“å…·)çš„ç¢°æ’æ£€æµ‹
+                    playerHitCloud(cloudBombBitmap,canvas);
+                    //ç‚¸å¼¹ä¸æ•Œæœºçš„ç¢°æ’æ£€æµ‹
+                    bulletHitEnemy(enemyBombBitmapArray,canvas);
+                    //æ•Œæœºä¸ç©å®¶é£æœºçš„ç¢°æ’æ£€æµ‹
+                    if(!enemyHitPlayer(playerBombBitmap,canvas))
+                        //ç»˜åˆ¶ç©å®¶é£æœº
+                        drawPlayer(playerBitmap,canvas);
+                    //ç»˜åˆ¶ç‚¸å¼¹
+                    drawBullet(bulletBitmap,canvas);
+                    //ç»˜åˆ¶æ•Œæœº
+                    drawEnemy(enemyBitmapArray,canvas);
+                    //ç»˜åˆ¶äº‘(é“å…·)
+                    drawCloud(cloudBitmap,canvas);
+                    //ç»˜åˆ¶åˆ†æ•°
+                    drawScore(canvas);
+                    //åˆ¤æ–­æ•Œæœºç¾¤æ”»æç¤ºæ˜¯å¦å±•ç¤ºï¼Œæ˜¯åˆ™ç»˜åˆ¶æç¤º
+                    if(isNoticeShowing)drawNotice(noticeBitmapArray,noticeSequence,canvas);
+                    //åˆ¤æ–­é“å…·åŠ åˆ†æ˜¯å¦è·å¾—ï¼Œæ˜¯åˆ™ç»˜åˆ¶åŠ åˆ†æ•ˆæœ
+                    if(isScoreAdding)drawScoreAdding(scoreAddingBitmap,canvas);
+                    //è§£é”ç”»å¸ƒï¼Œæäº¤æ›´æ–°
+                    holder.unlockCanvasAndPost(canvas);
+                }           
+            }
+        }           
     }
-    //»æÖÆÌì¿Õ±³¾°
+    //ç»˜åˆ¶å¤©ç©ºèƒŒæ™¯
     private void drawSky(Bitmap skyBitmap,Canvas canvas){
-    	    	
-    	//Ë¢ĞÂ±³¾°Í¼µÄ×İ×ø±ê
-    	skyY+=4;
-    	//Ìì¿ÕÍ¼ÏòÏÂÒÆ¶¯Ê±£¬ÆÁÄ»ÉÏ·½¿Õ³öµÄ²¿·ÖÔÙÓÃÌì¿ÕÍ¼À´Ìî³ä
-    	canvas.drawBitmap(skyBitmap, 0, skyY, null);
-    	canvas.drawBitmap(skyBitmap, 0, skyY-skyBitmapHeight, null);
-    	if(skyY>=screenHeight)skyY-=skyBitmapHeight;
-    	
+                
+        //åˆ·æ–°èƒŒæ™¯å›¾çš„çºµåæ ‡
+        skyY+=4;
+        //å¤©ç©ºå›¾å‘ä¸‹ç§»åŠ¨æ—¶ï¼Œå±å¹•ä¸Šæ–¹ç©ºå‡ºçš„éƒ¨åˆ†å†ç”¨å¤©ç©ºå›¾æ¥å¡«å……
+        canvas.drawBitmap(skyBitmap, 0, skyY, null);
+        canvas.drawBitmap(skyBitmap, 0, skyY-skyBitmapHeight, null);
+        if(skyY>=screenHeight)skyY-=skyBitmapHeight;
+        
     }
   
-    //»æÖÆÍæ¼Ò·É»ú
+    //ç»˜åˆ¶ç©å®¶é£æœº
     private void drawPlayer(Bitmap playerBitmap,Canvas canvas){
-    	
-    	//¸ù¾İ´¥ÆÁ½Ó´¥µãµÄÎ»ÒÆ¸üĞÂÍæ¼Ò·É»úµÄ×ø±ê
-    	playerX+=dx;
-    	playerY+=dy;
-    	dx=0;
-    	dy=0;
-    	//±ßÔµ¼ì²â£¬·ÀÖ¹Íæ¼Ò·É»ú»æÖÆ³ö½ç
-    	if(playerX<=0)playerX=0;
-    	if(playerX>=screenWidth-playerBitmapWidth)
-    		playerX=screenWidth-playerBitmapWidth;
-    	if(playerY<=0)playerY=0;
-    	if(playerY>=screenHeight-playerBitmapHeight)
-    		playerY=screenHeight-playerBitmapHeight;
-    	player.drawPlayer(canvas, playerX, playerY);
+        
+        //æ ¹æ®è§¦å±æ¥è§¦ç‚¹çš„ä½ç§»æ›´æ–°ç©å®¶é£æœºçš„åæ ‡
+        playerX+=dx;
+        playerY+=dy;
+        dx=0;
+        dy=0;
+        //è¾¹ç¼˜æ£€æµ‹ï¼Œé˜²æ­¢ç©å®¶é£æœºç»˜åˆ¶å‡ºç•Œ
+        if(playerX<=0)playerX=0;
+        if(playerX>=screenWidth-playerBitmapWidth)
+            playerX=screenWidth-playerBitmapWidth;
+        if(playerY<=0)playerY=0;
+        if(playerY>=screenHeight-playerBitmapHeight)
+            playerY=screenHeight-playerBitmapHeight;
+        player.drawPlayer(canvas, playerX, playerY);
     }
     
-    //»æÖÆÕ¨µ¯
+    //ç»˜åˆ¶ç‚¸å¼¹
     private void drawBullet(Bitmap bulletBitmap,Canvas canvas){
-    	
-    	//¿ØÖÆÕ¨µ¯´´½¨µÄÊ±¼ä¼ä¸ô
-    	if(gameTimeNow-createBulletTime>=400){
-    		if(!isDoubleBullet){
-    			//´´½¨µ¥¸öÕ¨µ¯
-	    		int bulletX=playerX+(playerBitmapWidth/2-bulletBitmapWidth/2);
-			    int bulletY=playerY-bulletBitmapHeight;
-			    Bullet bullet=new Bullet(bulletBitmap,bulletX,bulletY);
-				bulletArray.add(bullet);
-				//¸üĞÂÕ¨µ¯´´½¨Ê±¼ä
-    		    createBulletTime=gameTimeNow;
-    		}
-    		else if(doubleBulletCount>0){
-    			//´´½¨Ë«±¶Õ¨µ¯
-    			int bulletX1=playerX+playerBitmapWidth-bulletBitmapWidth*3/2;
-    			int bulletX2=playerX+bulletBitmapWidth/2;
-    			int bulletY=playerY-bulletBitmapHeight+bulletBitmapHeight/2;
-    			Bullet bullet1=new Bullet(bulletBitmap,bulletX1,bulletY);
-				bulletArray.add(bullet1);
-				Bullet bullet2=new Bullet(bulletBitmap,bulletX2,bulletY);
-				bulletArray.add(bullet2);
-				doubleBulletCount--;
-				//¸üĞÂÕ¨µ¯´´½¨Ê±¼ä
-    		    createBulletTime=gameTimeNow;
-    		}
-    		else{
-    			//Ë«±¶Õ¨µ¯·¢Éä´ÎÊıÒÑÓÃÍê£¬¹Ø±ÕË«±¶Õ¨µ¯
-    			isDoubleBullet=false;
-    		}   		
-    	}
-    	//±éÀúÊı×é£¬»æÖÆÕ¨µ¯
-    	for(int i=0;i<bulletArray.size();i++){
-    		Bullet iBullet=bulletArray.get(i);
-    		iBullet.drawBullet(canvas);
-    		//¸üĞÂÕ¨µ¯×İ×ø±ê
-    		iBullet.moveBullet();
-    		//Õ¨µ¯·É³öÆÁÄ»£¬½«Æä´ÓÊı×éÖĞÒÆ³ı
-    		if(iBullet.getBulletY()<=0)bulletArray.remove(i);
-    	}
+        
+        //æ§åˆ¶ç‚¸å¼¹åˆ›å»ºçš„æ—¶é—´é—´éš”
+        if(gameTimeNow-createBulletTime>=400){
+            if(!isDoubleBullet){
+                //åˆ›å»ºå•ä¸ªç‚¸å¼¹
+                int bulletX=playerX+(playerBitmapWidth/2-bulletBitmapWidth/2);
+                int bulletY=playerY-bulletBitmapHeight;
+                Bullet bullet=new Bullet(bulletBitmap,bulletX,bulletY);
+                bulletArray.add(bullet);
+                //æ›´æ–°ç‚¸å¼¹åˆ›å»ºæ—¶é—´
+                createBulletTime=gameTimeNow;
+            }
+            else if(doubleBulletCount>0){
+                //åˆ›å»ºåŒå€ç‚¸å¼¹
+                int bulletX1=playerX+playerBitmapWidth-bulletBitmapWidth*3/2;
+                int bulletX2=playerX+bulletBitmapWidth/2;
+                int bulletY=playerY-bulletBitmapHeight+bulletBitmapHeight/2;
+                Bullet bullet1=new Bullet(bulletBitmap,bulletX1,bulletY);
+                bulletArray.add(bullet1);
+                Bullet bullet2=new Bullet(bulletBitmap,bulletX2,bulletY);
+                bulletArray.add(bullet2);
+                doubleBulletCount--;
+                //æ›´æ–°ç‚¸å¼¹åˆ›å»ºæ—¶é—´
+                createBulletTime=gameTimeNow;
+            }
+            else{
+                //åŒå€ç‚¸å¼¹å‘å°„æ¬¡æ•°å·²ç”¨å®Œï¼Œå…³é—­åŒå€ç‚¸å¼¹
+                isDoubleBullet=false;
+            }           
+        }
+        //éå†æ•°ç»„ï¼Œç»˜åˆ¶ç‚¸å¼¹
+        for(int i=0;i<bulletArray.size();i++){
+            Bullet iBullet=bulletArray.get(i);
+            iBullet.drawBullet(canvas);
+            //æ›´æ–°ç‚¸å¼¹çºµåæ ‡
+            iBullet.moveBullet();
+            //ç‚¸å¼¹é£å‡ºå±å¹•ï¼Œå°†å…¶ä»æ•°ç»„ä¸­ç§»é™¤
+            if(iBullet.getBulletY()<=0)bulletArray.remove(i);
+        }
     }
     
-    //»æÖÆµĞ»ú
+    //ç»˜åˆ¶æ•Œæœº
     private void drawEnemy(ArrayList<Bitmap> enemyBitmapArray,Canvas canvas){
-    	
-    	//¿ØÖÆµĞ»ú´´½¨µÄÊ±¼ä¼ä¸ô
-    	if(gameTimeNow-createEnemyTime>=1000){
-    		//´´½¨Ğ¡ĞÍµĞ»ú
-    		Random r=new Random();
-    		int enemyX=r.nextInt(screenWidth-enemyBitmapWidth);
-    		Enemy enemy=new Enemy(enemyBitmapArray.get(0),enemyX,0,0);
-    		enemyArray.add(enemy);
-    		//¸üĞÂµĞ»ú´´½¨Ê±¼ä
-    		createEnemyTime=gameTimeNow;	
-    	}
-    	if(gameTimeNow-createEnemyMTime>=9000){
-    		//´´½¨ÖĞĞÍµĞ»ú
-    		Random r=new Random();
-    		int enemyX=r.nextInt(screenWidth-enemyMBitmapWidth);
-    		Enemy enemy=new Enemy(enemyBitmapArray.get(1),enemyX,0,1);
-    		enemyArray.add(enemy);
-    		//¸üĞÂµĞ»ú´´½¨Ê±¼ä
-    		createEnemyMTime=gameTimeNow;
-    	}
-    	if(gameTimeNow-createEnemyLTime>=29000){
-    		//´´½¨´óĞÍµĞ»ú
-    		Random r=new Random();
-    		int enemyX=r.nextInt(screenWidth-enemyLBitmapWidth);
-    		Enemy enemy=new Enemy(enemyBitmapArray.get(2),enemyX,0,2);
-    		enemyArray.add(enemy);
-    		//¸üĞÂµĞ»ú´´½¨Ê±¼ä
-    		createEnemyLTime=gameTimeNow;
-    	}
-    	if(isEnemiesComing){
-    		//´´½¨ÖÁ¶à10¸öĞ¡ĞÍµĞ»ú(ÊÓ¾ßÌåÆÁÄ»¿í¶È¶ø¶¨)
-    		for(int i=0;i<5;i++){
-        		int enemyX1=screenWidth/2-enemyBitmapWidth-5-(10+enemyBitmapWidth)*i;
-        		//Èô´´½¨ºóµÄµĞ»ú½«ÓĞÒ»²¿·Ö²»ÏÔÊ¾ÔÚÆÁÄ»ÉÏ£¬ÔòÍ£Ö¹´´½¨
-        		if(enemyX1<0)break;
-        		int enemyX2=screenWidth/2+5+(10+enemyBitmapWidth)*i;
-        		Enemy enemy1=new Enemy(enemyBitmapArray.get(0),enemyX1,0,0);
-        		Enemy enemy2=new Enemy(enemyBitmapArray.get(0),enemyX2,0,0);
-        		enemyArray.add(enemy1);
-        		enemyArray.add(enemy2);
-    		}
-    	    //´´½¨ÖÁ¶à6¸öÖĞĞÍµĞ»ú(ÊÓ¾ßÌåÆÁÄ»¿í¶È¶ø¶¨)
-    		for(int i=0;i<3;i++){
-        		int enemyX1=screenWidth/2-enemyMBitmapWidth-10-(20+enemyMBitmapWidth)*i;
-        		//Èô´´½¨ºóµÄµĞ»ú½«ÓĞÒ»²¿·Ö²»ÏÔÊ¾ÔÚÆÁÄ»ÉÏ£¬ÔòÍ£Ö¹´´½¨
-        		if(enemyX1<0)break;
-        		int enemyX2=screenWidth/2+10+(20+enemyMBitmapWidth)*i;
-        		Enemy enemy1=new Enemy(enemyBitmapArray.get(1),enemyX1,-enemyMBitmapHeight,1);
-        		Enemy enemy2=new Enemy(enemyBitmapArray.get(1),enemyX2,-enemyMBitmapHeight,1);
-        		enemyArray.add(enemy1);
-        		enemyArray.add(enemy2);
-    		}
-    		//´´½¨3¸ö´óĞÍµĞ»ú
-        	Enemy enemy1=new Enemy(enemyBitmapArray.get(2),10,-enemyMBitmapHeight-enemyLBitmapHeight,2);
-        	Enemy enemy2=new Enemy(enemyBitmapArray.get(2),screenWidth-enemyLBitmapWidth-10,-enemyMBitmapHeight-enemyLBitmapHeight,2);
-        	Enemy enemy3=new Enemy(enemyBitmapArray.get(2),screenWidth/2-enemyLBitmapWidth/2,-enemyMBitmapHeight-enemyLBitmapHeight,2);
-        	enemyArray.add(enemy1);
-        	enemyArray.add(enemy2);
-        	enemyArray.add(enemy3);
-    		isEnemiesComing=false;
-    		//¸üĞÂµĞ»ú´´½¨Ê±¼ä
-    		createEnemyTime=createEnemyMTime=createEnemyLTime=gameTimeNow;
-    	}
-    	//±éÀúÊı×é£¬»æÖÆµĞ»ú
-    	for(int i=0;i<enemyArray.size();i++){
-    		Enemy iEnemy=enemyArray.get(i);
-    		iEnemy.drawEnemy(canvas);
-    		//¸üĞÂµĞ»ú×İ×ø±ê
-    		iEnemy.moveEnemy();
-    		//µĞ»ú·É³öÆÁÄ»£¬½«Æä´ÓÊı×éÖĞÒÆ³ı
-    		if(iEnemy.getEnemyY()>=screenHeight)enemyArray.remove(i);
-    	}
+        
+        //æ§åˆ¶æ•Œæœºåˆ›å»ºçš„æ—¶é—´é—´éš”
+        if(gameTimeNow-createEnemyTime>=1000){
+            //åˆ›å»ºå°å‹æ•Œæœº
+            Random r=new Random();
+            int enemyX=r.nextInt(screenWidth-enemyBitmapWidth);
+            Enemy enemy=new Enemy(enemyBitmapArray.get(0),enemyX,0,0);
+            enemyArray.add(enemy);
+            //æ›´æ–°æ•Œæœºåˆ›å»ºæ—¶é—´
+            createEnemyTime=gameTimeNow;    
+        }
+        if(gameTimeNow-createEnemyMTime>=9000){
+            //åˆ›å»ºä¸­å‹æ•Œæœº
+            Random r=new Random();
+            int enemyX=r.nextInt(screenWidth-enemyMBitmapWidth);
+            Enemy enemy=new Enemy(enemyBitmapArray.get(1),enemyX,0,1);
+            enemyArray.add(enemy);
+            //æ›´æ–°æ•Œæœºåˆ›å»ºæ—¶é—´
+            createEnemyMTime=gameTimeNow;
+        }
+        if(gameTimeNow-createEnemyLTime>=29000){
+            //åˆ›å»ºå¤§å‹æ•Œæœº
+            Random r=new Random();
+            int enemyX=r.nextInt(screenWidth-enemyLBitmapWidth);
+            Enemy enemy=new Enemy(enemyBitmapArray.get(2),enemyX,0,2);
+            enemyArray.add(enemy);
+            //æ›´æ–°æ•Œæœºåˆ›å»ºæ—¶é—´
+            createEnemyLTime=gameTimeNow;
+        }
+        if(isEnemiesComing){
+            //åˆ›å»ºè‡³å¤š10ä¸ªå°å‹æ•Œæœº(è§†å…·ä½“å±å¹•å®½åº¦è€Œå®š)
+            for(int i=0;i<5;i++){
+                int enemyX1=screenWidth/2-enemyBitmapWidth-5-(10+enemyBitmapWidth)*i;
+                //è‹¥åˆ›å»ºåçš„æ•Œæœºå°†æœ‰ä¸€éƒ¨åˆ†ä¸æ˜¾ç¤ºåœ¨å±å¹•ä¸Šï¼Œåˆ™åœæ­¢åˆ›å»º
+                if(enemyX1<0)break;
+                int enemyX2=screenWidth/2+5+(10+enemyBitmapWidth)*i;
+                Enemy enemy1=new Enemy(enemyBitmapArray.get(0),enemyX1,0,0);
+                Enemy enemy2=new Enemy(enemyBitmapArray.get(0),enemyX2,0,0);
+                enemyArray.add(enemy1);
+                enemyArray.add(enemy2);
+            }
+            //åˆ›å»ºè‡³å¤š6ä¸ªä¸­å‹æ•Œæœº(è§†å…·ä½“å±å¹•å®½åº¦è€Œå®š)
+            for(int i=0;i<3;i++){
+                int enemyX1=screenWidth/2-enemyMBitmapWidth-10-(20+enemyMBitmapWidth)*i;
+                //è‹¥åˆ›å»ºåçš„æ•Œæœºå°†æœ‰ä¸€éƒ¨åˆ†ä¸æ˜¾ç¤ºåœ¨å±å¹•ä¸Šï¼Œåˆ™åœæ­¢åˆ›å»º
+                if(enemyX1<0)break;
+                int enemyX2=screenWidth/2+10+(20+enemyMBitmapWidth)*i;
+                Enemy enemy1=new Enemy(enemyBitmapArray.get(1),enemyX1,-enemyMBitmapHeight,1);
+                Enemy enemy2=new Enemy(enemyBitmapArray.get(1),enemyX2,-enemyMBitmapHeight,1);
+                enemyArray.add(enemy1);
+                enemyArray.add(enemy2);
+            }
+            //åˆ›å»º3ä¸ªå¤§å‹æ•Œæœº
+            Enemy enemy1=new Enemy(enemyBitmapArray.get(2),10,-enemyMBitmapHeight-enemyLBitmapHeight,2);
+            Enemy enemy2=new Enemy(enemyBitmapArray.get(2),screenWidth-enemyLBitmapWidth-10,-enemyMBitmapHeight-enemyLBitmapHeight,2);
+            Enemy enemy3=new Enemy(enemyBitmapArray.get(2),screenWidth/2-enemyLBitmapWidth/2,-enemyMBitmapHeight-enemyLBitmapHeight,2);
+            enemyArray.add(enemy1);
+            enemyArray.add(enemy2);
+            enemyArray.add(enemy3);
+            isEnemiesComing=false;
+            //æ›´æ–°æ•Œæœºåˆ›å»ºæ—¶é—´
+            createEnemyTime=createEnemyMTime=createEnemyLTime=gameTimeNow;
+        }
+        //éå†æ•°ç»„ï¼Œç»˜åˆ¶æ•Œæœº
+        for(int i=0;i<enemyArray.size();i++){
+            Enemy iEnemy=enemyArray.get(i);
+            iEnemy.drawEnemy(canvas);
+            //æ›´æ–°æ•Œæœºçºµåæ ‡
+            iEnemy.moveEnemy();
+            //æ•Œæœºé£å‡ºå±å¹•ï¼Œå°†å…¶ä»æ•°ç»„ä¸­ç§»é™¤
+            if(iEnemy.getEnemyY()>=screenHeight)enemyArray.remove(i);
+        }
     }
  
-    //»æÖÆÔÆ(µÀ¾ß)
+    //ç»˜åˆ¶äº‘(é“å…·)
     private void drawCloud(Bitmap cloudBitmap,Canvas canvas){
-    	
-    	//¿ØÖÆÔÆ(µÀ¾ß)´´½¨µÄÊ±¼ä¼ä¸ô
-    	if(gameTimeNow-createCloudTime>=20000){
-    		//´´½¨ÔÆ(µÀ¾ß)
-    		Random r=new Random();
-    		int cloudX=r.nextInt(screenWidth-cloudBitmapWidth);
-    		Cloud cloud=new Cloud(cloudBitmap,cloudX,0);
-    		cloudArray.add(cloud);
-    		//¸üĞÂÔÆ(µÀ¾ß)´´½¨Ê±¼ä
-    		createCloudTime=gameTimeNow;
-    	}
-    	//±éÀúÊı×é£¬»æÖÆÔÆ(µÀ¾ß)
-    	for(int i=0;i<cloudArray.size();i++){
-    		Cloud iCloud=cloudArray.get(i);
-    		iCloud.drawCloud(canvas);
-    		//¸üĞÂÔÆ(µÀ¾ß)×İ×ø±ê
-    		iCloud.moveCloud();
-    		//ÈôÔÆ(µÀ¾ß)·É³öÆÁÄ»£¬½«Æä´ÓÊı×éÖĞÒÆ³ı
-    		if(iCloud.getCloudY()>=screenHeight)cloudArray.remove(i);
-    	}
+        
+        //æ§åˆ¶äº‘(é“å…·)åˆ›å»ºçš„æ—¶é—´é—´éš”
+        if(gameTimeNow-createCloudTime>=20000){
+            //åˆ›å»ºäº‘(é“å…·)
+            Random r=new Random();
+            int cloudX=r.nextInt(screenWidth-cloudBitmapWidth);
+            Cloud cloud=new Cloud(cloudBitmap,cloudX,0);
+            cloudArray.add(cloud);
+            //æ›´æ–°äº‘(é“å…·)åˆ›å»ºæ—¶é—´
+            createCloudTime=gameTimeNow;
+        }
+        //éå†æ•°ç»„ï¼Œç»˜åˆ¶äº‘(é“å…·)
+        for(int i=0;i<cloudArray.size();i++){
+            Cloud iCloud=cloudArray.get(i);
+            iCloud.drawCloud(canvas);
+            //æ›´æ–°äº‘(é“å…·)çºµåæ ‡
+            iCloud.moveCloud();
+            //è‹¥äº‘(é“å…·)é£å‡ºå±å¹•ï¼Œå°†å…¶ä»æ•°ç»„ä¸­ç§»é™¤
+            if(iCloud.getCloudY()>=screenHeight)cloudArray.remove(i);
+        }
     }
     
-    //»æÖÆ·ÖÊı
+    //ç»˜åˆ¶åˆ†æ•°
     private void drawScore(Canvas canvas){
-    	
-    	//ÉèÖÃ»­±ÊÊôĞÔ
-    	Paint paint=new Paint();
-    	paint.setTextSize(30);
-    	paint.setColor(Color.GRAY);
-    	//µÀ¾ß¼Ó·ÖÊ±ÏÔÊ¾ºìÉ«
-    	if(isScoreAdding)paint.setColor(Color.RED);
-    	paint.setFakeBoldText(true);
-    	canvas.drawText("score: "+score,5,30,paint);
+        
+        //è®¾ç½®ç”»ç¬”å±æ€§
+        Paint paint=new Paint();
+        paint.setTextSize(30);
+        paint.setColor(Color.GRAY);
+        //é“å…·åŠ åˆ†æ—¶æ˜¾ç¤ºçº¢è‰²
+        if(isScoreAdding)paint.setColor(Color.RED);
+        paint.setFakeBoldText(true);
+        canvas.drawText("score: "+score,5,30,paint);
     }
     
-    //»æÖÆµĞ»úÈº¹¥ÌáÊ¾
+    //ç»˜åˆ¶æ•Œæœºç¾¤æ”»æç¤º
     private void drawNotice(ArrayList<Bitmap> noticeBitmapArray,int[] noticeSequence,Canvas canvas){
-    	if(noticeCount>0){
-    		//¸ù¾İµĞ»úÈº¹¥ÌáÊ¾Í¼µÄË¢ĞÂĞòÁĞ£¬ÒÀ´Î»æÖÆÏàÓ¦µÄÍ¼Æ¬
-    		canvas.drawBitmap(noticeBitmapArray.get(noticeSequence[noticeSequence.length-noticeCount]), noticeX, noticeY, null);
-    		System.out.println("noticeCount:"+noticeCount);
-    		noticeCount--;
-    	}
-    	else{
-    		//µĞ»úÈº¹¥ÌáÊ¾Õ¹Ê¾Íê±Ï£¬¹Ø±ÕÌáÊ¾
-    		isNoticeShowing=false;
-    		noticeCount=noticeSequence.length;
-    	}
+        if(noticeCount>0){
+            //æ ¹æ®æ•Œæœºç¾¤æ”»æç¤ºå›¾çš„åˆ·æ–°åºåˆ—ï¼Œä¾æ¬¡ç»˜åˆ¶ç›¸åº”çš„å›¾ç‰‡
+            canvas.drawBitmap(noticeBitmapArray.get(noticeSequence[noticeSequence.length-noticeCount]), noticeX, noticeY, null);
+            System.out.println("noticeCount:"+noticeCount);
+            noticeCount--;
+        }
+        else{
+            //æ•Œæœºç¾¤æ”»æç¤ºå±•ç¤ºå®Œæ¯•ï¼Œå…³é—­æç¤º
+            isNoticeShowing=false;
+            noticeCount=noticeSequence.length;
+        }
     }
  
-    //»æÖÆµÀ¾ß¼Ó·ÖĞ§¹û
+    //ç»˜åˆ¶é“å…·åŠ åˆ†æ•ˆæœ
     private void drawScoreAdding(Bitmap scoreAddingBitmap,Canvas canvas){
-    	if(--scoreAddingCount>0){
-    		canvas.drawBitmap(scoreAddingBitmap, scoreAddingX, scoreAddingY, null);
-    		//¸üĞÂµÀ¾ß¼Ó·ÖĞ§¹ûÍ¼µÄ×İ×ø±ê
-    		scoreAddingY+=3;
-    	}
-    	else{
-    		//µÀ¾ß¼Ó·ÖĞ§¹ûÕ¹Ê¾Íê±Ï£¬¹Ø±ÕĞ§¹û
-    		isScoreAdding=false;
-    	}
+        if(--scoreAddingCount>0){
+            canvas.drawBitmap(scoreAddingBitmap, scoreAddingX, scoreAddingY, null);
+            //æ›´æ–°é“å…·åŠ åˆ†æ•ˆæœå›¾çš„çºµåæ ‡
+            scoreAddingY+=3;
+        }
+        else{
+            //é“å…·åŠ åˆ†æ•ˆæœå±•ç¤ºå®Œæ¯•ï¼Œå…³é—­æ•ˆæœ
+            isScoreAdding=false;
+        }
     }
     
-    //Íæ¼Ò·É»úÓëÔÆ(µÀ¾ß)µÄÅö×²¼ì²â
+    //ç©å®¶é£æœºä¸äº‘(é“å…·)çš„ç¢°æ’æ£€æµ‹
     private void playerHitCloud(Bitmap cloudBombBitmap,Canvas canvas){
-    	
-    	//±éÀúÔÆ(µÀ¾ß)Êı×é
-    	for(int i=0;i<cloudArray.size();i++){
-    		Cloud iCloud=cloudArray.get(i);
-    		int iCloudX=iCloud.getCloudX();
-    		int iCloudY=iCloud.getCloudY();
-    		int playerCenterX=playerX+playerBitmapWidth/2;
-    		int playerCenterY=playerY+playerBitmapHeight/2;
-    		//ÈôÍæ¼Ò·É»úµÄÖĞĞÄ×ø±ê½øÈëÔÆ(µÀ¾ß)Í¼µÄ·¶Î§Àï£¬ÔòÈÏ¶¨Íæ¼Ò·É»ú»ñµÃ´ËµÀ¾ß
-    		if(playerCenterX>=iCloudX&&playerCenterX<=iCloudX+cloudBitmapWidth&&playerCenterY>=iCloudY&&playerCenterY<=iCloudY+cloudBitmapHeight){
-    			Random r=new Random();
-    			switch(r.nextInt(3)){
-    			case 0:
-    				//»ñµÃË«±¶Õ¨µ¯
-    				isDoubleBullet=true;
-    				doubleBulletCount=30;
-    				break;
-    			case 1:
-    				//»ñµÃ¶îÍâ¼Ó·Ö
-    				score+=3000;
-    				isScoreAdding=true;
-    				scoreAddingCount=10;
-    				scoreAddingX=iCloudX;
-    				//ÈôµÀ¾ß¼Ó·ÖĞ§¹ûÍ¼³ö½ç£¬½«ÆäÒÆÖÁ½çÄÚ
+        
+        //éå†äº‘(é“å…·)æ•°ç»„
+        for(int i=0;i<cloudArray.size();i++){
+            Cloud iCloud=cloudArray.get(i);
+            int iCloudX=iCloud.getCloudX();
+            int iCloudY=iCloud.getCloudY();
+            int playerCenterX=playerX+playerBitmapWidth/2;
+            int playerCenterY=playerY+playerBitmapHeight/2;
+            //è‹¥ç©å®¶é£æœºçš„ä¸­å¿ƒåæ ‡è¿›å…¥äº‘(é“å…·)å›¾çš„èŒƒå›´é‡Œï¼Œåˆ™è®¤å®šç©å®¶é£æœºè·å¾—æ­¤é“å…·
+            if(playerCenterX>=iCloudX&&playerCenterX<=iCloudX+cloudBitmapWidth&&playerCenterY>=iCloudY&&playerCenterY<=iCloudY+cloudBitmapHeight){
+                Random r=new Random();
+                switch(r.nextInt(3)){
+                case 0:
+                    //è·å¾—åŒå€ç‚¸å¼¹
+                    isDoubleBullet=true;
+                    doubleBulletCount=30;
+                    break;
+                case 1:
+                    //è·å¾—é¢å¤–åŠ åˆ†
+                    score+=3000;
+                    isScoreAdding=true;
+                    scoreAddingCount=10;
+                    scoreAddingX=iCloudX;
+                    //è‹¥é“å…·åŠ åˆ†æ•ˆæœå›¾å‡ºç•Œï¼Œå°†å…¶ç§»è‡³ç•Œå†…
                     if(scoreAddingX+scoreAddingBitmapWidth>screenWidth)scoreAddingX=screenWidth-scoreAddingBitmapWidth;
                     scoreAddingY=iCloudY-scoreAddingBitmapHeight;
                     if(scoreAddingY<0)scoreAddingY=iCloudY+cloudBitmapHeight;
-    				break;
-    			case 2:	
-    				//¿ªÆôµĞ»úÈº¹¥£¬Ò»´ó²¨·É»úÕıÔÚ¿¿½ü
-    				isEnemiesComing=true;
-    				isNoticeShowing=true;
-    				break;
-    			}
-    			//»æÖÆÔÆ(µÀ¾ß)·Ö½âĞ§¹û
-    			canvas.drawBitmap(cloudBombBitmap, iCloudX, iCloudY, null);
-    			//½«ÔÆ(µÀ¾ß)´ÓÊı×éÖĞÒÆ³ı
-    			cloudArray.remove(i);
-    			i--;
-    		}
-    	}
+                    break;
+                case 2: 
+                    //å¼€å¯æ•Œæœºç¾¤æ”»ï¼Œä¸€å¤§æ³¢é£æœºæ­£åœ¨é è¿‘
+                    isEnemiesComing=true;
+                    isNoticeShowing=true;
+                    break;
+                }
+                //ç»˜åˆ¶äº‘(é“å…·)åˆ†è§£æ•ˆæœ
+                canvas.drawBitmap(cloudBombBitmap, iCloudX, iCloudY, null);
+                //å°†äº‘(é“å…·)ä»æ•°ç»„ä¸­ç§»é™¤
+                cloudArray.remove(i);
+                i--;
+            }
+        }
     }
     
-    //Õ¨µ¯ÓëµĞ»úµÄÅö×²¼ì²â
+    //ç‚¸å¼¹ä¸æ•Œæœºçš„ç¢°æ’æ£€æµ‹
     private void bulletHitEnemy(ArrayList<Bitmap> enemyBombBitmapArray,Canvas canvas){
-    	
-    	//±éÀúÕ¨µ¯Êı×é
-    	for(int i=0;i<bulletArray.size();i++){
-    		Bullet iBullet=bulletArray.get(i);
-    		int iBulletX=iBullet.getBulletX();
-    		int iBulletY=iBullet.getBulletY();
-    		//±éÀúµĞ»úÊı×é
-    		for(int j=0;j<enemyArray.size();j++){
-    			Enemy iEnemy=enemyArray.get(j);
-    			int iEnemyX=iEnemy.getEnemyX();
-    			int iEnemyY=iEnemy.getEnemyY();
-    			int enemyBitmapWidth=iEnemy.getEnemyBimmapWidth();
-    			int enemyBitmapHeight=iEnemy.getEnemyBitmaoHeight();
-    			//ÈôÕ¨µ¯µÄ×óÉÏ½Ç»òÓÒÉÏ½Ç½øÈëµĞ»úÍ¼µÄ·¶Î§ÄÚ£¬ÔòÈÏ¶¨Õ¨µ¯»÷ÖĞµĞ»ú
-	    		if((iBulletX>=iEnemyX&&iBulletX<=iEnemyX+enemyBitmapWidth||
-    				iBulletX+bulletBitmapWidth>=iEnemyX&&iBulletX+bulletBitmapWidth<=iEnemyX+enemyBitmapWidth)&&
-    				iBulletY>=iEnemyY&&iBulletY<=iEnemyY+enemyBitmapHeight){
-	    			//ÅĞ¶Ïµ±Ç°µĞ»úµÄÑªÁ¿ÊÇ·ñÎªÁã£¬ÊÇÔò»æÖÆµĞ»ú±¬Õ¨Ğ§¹û£¬²¢½«µĞ»ú´ÓÊı×éÖĞÒÆ³ı
-	    			if(iEnemy.hitEnemy()){
-	    				canvas.drawBitmap(enemyBombBitmapArray.get(iEnemy.getType()), iEnemyX, iEnemyY, null);
-	    				//¼Ó·Ö
-	    			    score+=iEnemy.getScore();
-	    				enemyArray.remove(j);
-	    			}
-	    			//½«»÷ÖĞµĞ»úµÄÕ¨µ¯´ÓÊı×éÖĞÒÆ³ı
-	    			bulletArray.remove(i);
-	    			/*×¢ÒâArraylistÉ¾³ıÔªËØºósizeµÄ±ä»¯£¬·ÀÖ¹·ÃÎÊÊı×é³ö½ç*/
-	    			i--;
-	    			j--;	    			
-	    			break;
-	    		}	    		
-	    	}
-    	}
+        
+        //éå†ç‚¸å¼¹æ•°ç»„
+        for(int i=0;i<bulletArray.size();i++){
+            Bullet iBullet=bulletArray.get(i);
+            int iBulletX=iBullet.getBulletX();
+            int iBulletY=iBullet.getBulletY();
+            //éå†æ•Œæœºæ•°ç»„
+            for(int j=0;j<enemyArray.size();j++){
+                Enemy iEnemy=enemyArray.get(j);
+                int iEnemyX=iEnemy.getEnemyX();
+                int iEnemyY=iEnemy.getEnemyY();
+                int enemyBitmapWidth=iEnemy.getEnemyBimmapWidth();
+                int enemyBitmapHeight=iEnemy.getEnemyBitmaoHeight();
+                //è‹¥ç‚¸å¼¹çš„å·¦ä¸Šè§’æˆ–å³ä¸Šè§’è¿›å…¥æ•Œæœºå›¾çš„èŒƒå›´å†…ï¼Œåˆ™è®¤å®šç‚¸å¼¹å‡»ä¸­æ•Œæœº
+                if((iBulletX>=iEnemyX&&iBulletX<=iEnemyX+enemyBitmapWidth||
+                    iBulletX+bulletBitmapWidth>=iEnemyX&&iBulletX+bulletBitmapWidth<=iEnemyX+enemyBitmapWidth)&&
+                    iBulletY>=iEnemyY&&iBulletY<=iEnemyY+enemyBitmapHeight){
+                    //åˆ¤æ–­å½“å‰æ•Œæœºçš„è¡€é‡æ˜¯å¦ä¸ºé›¶ï¼Œæ˜¯åˆ™ç»˜åˆ¶æ•Œæœºçˆ†ç‚¸æ•ˆæœï¼Œå¹¶å°†æ•Œæœºä»æ•°ç»„ä¸­ç§»é™¤
+                    if(iEnemy.hitEnemy()){
+                        canvas.drawBitmap(enemyBombBitmapArray.get(iEnemy.getType()), iEnemyX, iEnemyY, null);
+                        //åŠ åˆ†
+                        score+=iEnemy.getScore();
+                        enemyArray.remove(j);
+                    }
+                    //å°†å‡»ä¸­æ•Œæœºçš„ç‚¸å¼¹ä»æ•°ç»„ä¸­ç§»é™¤
+                    bulletArray.remove(i);
+                    /*æ³¨æ„Arrayliståˆ é™¤å…ƒç´ åsizeçš„å˜åŒ–ï¼Œé˜²æ­¢è®¿é—®æ•°ç»„å‡ºç•Œ*/
+                    i--;
+                    j--;                    
+                    break;
+                }               
+            }
+        }
     }
     
-    //µĞ»úÓëÍæ¼Ò·É»úµÄÅö×²¼ì²â
+    //æ•Œæœºä¸ç©å®¶é£æœºçš„ç¢°æ’æ£€æµ‹
     private boolean enemyHitPlayer(Bitmap playerBombBitmap,Canvas canvas){
-    	
-    	//±éÀúµĞ»úÊı×é
-    	for(int i=0;i<enemyArray.size();i++){
-    		Enemy iEnemy=enemyArray.get(i);
-    		int iEnemyX=iEnemy.getEnemyX();
-    		int iEnemyY=iEnemy.getEnemyY()-iEnemy.getEnemySpeed();
-    		int enemyBitmapWidth=iEnemy.getEnemyBimmapWidth();
-    		int enemyBitmapHeight=iEnemy.getEnemyBitmaoHeight();
-    		int iEnemyCenterX=iEnemyX+enemyBitmapWidth/2;
-    		int iEnemyCenterY=iEnemyY+enemyBitmapHeight/2;
-    		int playerCenterX=playerX+playerBitmapWidth/2;
-    		int playerCenterY=playerY+playerBitmapHeight/2;
-    	    //ÓÃÍæ¼Ò·É»úÓëµĞ»úÍ¼µÄÄÚÇĞÔ²×÷ÎªÅö×²¼ì²âµÄ·¶Î§£¬Í¼Æ¬¿í¸ß¾ùÏàµÈ
-    		double result=Math.sqrt((iEnemyCenterX-playerCenterX)*(iEnemyCenterX-playerCenterX)+(iEnemyCenterY-playerCenterY)*(iEnemyCenterY-playerCenterY));
-    		if(result<playerBitmapWidth/2+enemyBitmapWidth/2){
-    		/*//ÓÃÍæ¼Ò·É»úÓëµĞ»úÍ¼×÷ÎªÅö×²¼ì²âµÄ·¶Î§£¬Í¼µÄËÄ¸ö½ÇµÄ¿Õ°×ÈÃÅö×²¼ì²âĞ§¹û²»Ã÷ÏÔ
-    		  if((iEnemyX>=playerX&&iEnemyX<=playerX+playerBitmapWidth||
-    				iEnemyX+enemyBitmapWidth>=playerX&&iEnemyX+enemyBitmapWidth<=playerX+playerBitmapWidth)&&
-    				(iEnemyY>=playerY&&iEnemyY<=playerY+playerBitmapHeight||
-    				iEnemyY+enemyBitmapHeight>=playerY&&iEnemyY+enemyBitmapHeight<=playerY+playerBitmapHeight)
-    				){*/
-    			System.out.println("stop:"+result);
-    			canvas.drawBitmap(playerBombBitmap, playerX, playerY, null);
-    			//ÔİÍ£ÓÎÏ·£¬»­²¼Í£Ö¹»æÖÆ
-    			isPaused=true;
-    			
-    			handler.post(new Runnable(){
+        
+        //éå†æ•Œæœºæ•°ç»„
+        for(int i=0;i<enemyArray.size();i++){
+            Enemy iEnemy=enemyArray.get(i);
+            int iEnemyX=iEnemy.getEnemyX();
+            int iEnemyY=iEnemy.getEnemyY()-iEnemy.getEnemySpeed();
+            int enemyBitmapWidth=iEnemy.getEnemyBimmapWidth();
+            int enemyBitmapHeight=iEnemy.getEnemyBitmaoHeight();
+            int iEnemyCenterX=iEnemyX+enemyBitmapWidth/2;
+            int iEnemyCenterY=iEnemyY+enemyBitmapHeight/2;
+            int playerCenterX=playerX+playerBitmapWidth/2;
+            int playerCenterY=playerY+playerBitmapHeight/2;
+            //ç”¨ç©å®¶é£æœºä¸æ•Œæœºå›¾çš„å†…åˆ‡åœ†ä½œä¸ºç¢°æ’æ£€æµ‹çš„èŒƒå›´ï¼Œå›¾ç‰‡å®½é«˜å‡ç›¸ç­‰
+            double result=Math.sqrt((iEnemyCenterX-playerCenterX)*(iEnemyCenterX-playerCenterX)+(iEnemyCenterY-playerCenterY)*(iEnemyCenterY-playerCenterY));
+            if(result<playerBitmapWidth/2+enemyBitmapWidth/2){
+            /*//ç”¨ç©å®¶é£æœºä¸æ•Œæœºå›¾ä½œä¸ºç¢°æ’æ£€æµ‹çš„èŒƒå›´ï¼Œå›¾çš„å››ä¸ªè§’çš„ç©ºç™½è®©ç¢°æ’æ£€æµ‹æ•ˆæœä¸æ˜æ˜¾
+              if((iEnemyX>=playerX&&iEnemyX<=playerX+playerBitmapWidth||
+                    iEnemyX+enemyBitmapWidth>=playerX&&iEnemyX+enemyBitmapWidth<=playerX+playerBitmapWidth)&&
+                    (iEnemyY>=playerY&&iEnemyY<=playerY+playerBitmapHeight||
+                    iEnemyY+enemyBitmapHeight>=playerY&&iEnemyY+enemyBitmapHeight<=playerY+playerBitmapHeight)
+                    ){*/
+                System.out.println("stop:"+result);
+                canvas.drawBitmap(playerBombBitmap, playerX, playerY, null);
+                //æš‚åœæ¸¸æˆï¼Œç”»å¸ƒåœæ­¢ç»˜åˆ¶
+                isPaused=true;
+                
+                handler.post(new Runnable(){
 
-					@Override
-					public void run() {
-                        //µ¯³ö¶Ô»°¿ò
-		    			new AlertDialog.Builder(PlaneBattleActivity.this).setTitle("ÓÎÏ·½áÊø").setMessage("ÊÇ·ñÖØĞÂ¿ªÊ¼?")
-		    			.setCancelable(false)
-		    			.setPositiveButton("ÊÇ", new OnClickListener(){
-		
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								//³õÊ¼»¯ÓÎÏ·Êı¾İ
-								bulletArray.clear();
-								enemyArray.clear();
-								playerX=screenWidth/2-playerBitmapWidth/2;
-								playerY=screenHeight-playerBitmapHeight;
-								createBulletTime=createCloudTime=createEnemyLTime=createEnemyMTime=
-									createEnemyTime=System.currentTimeMillis();
-								score=0;
-								//ÓÎÏ·ÖØĞÂ¿ªÊ¼
-								isPaused=false;
-								
-							}
-		    				
-		    			}).setNegativeButton("ÍË³ö", new OnClickListener(){
-		
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								PlaneBattleActivity.this.finish();
-							}
-		    				
-		    			}).setOnKeyListener(new OnKeyListener(){
+                    @Override
+                    public void run() {
+                        //å¼¹å‡ºå¯¹è¯æ¡†
+                        new AlertDialog.Builder(PlaneBattleActivity.this).setTitle("æ¸¸æˆç»“æŸ").setMessage("æ˜¯å¦é‡æ–°å¼€å§‹?")
+                        .setCancelable(false)
+                        .setPositiveButton("æ˜¯", new OnClickListener(){
+        
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //åˆå§‹åŒ–æ¸¸æˆæ•°æ®
+                                bulletArray.clear();
+                                enemyArray.clear();
+                                playerX=screenWidth/2-playerBitmapWidth/2;
+                                playerY=screenHeight-playerBitmapHeight;
+                                createBulletTime=createCloudTime=createEnemyLTime=createEnemyMTime=
+                                    createEnemyTime=System.currentTimeMillis();
+                                score=0;
+                                //æ¸¸æˆé‡æ–°å¼€å§‹
+                                isPaused=false;
+                                
+                            }
+                            
+                        }).setNegativeButton("é€€å‡º", new OnClickListener(){
+        
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                PlaneBattleActivity.this.finish();
+                            }
+                            
+                        }).setOnKeyListener(new OnKeyListener(){
 
-							@Override
-							public boolean onKey(DialogInterface dialog,
-									int keyCode, KeyEvent event) {
-								switch(keyCode){
-								case KeyEvent.KEYCODE_BACK:
-									//ÔÚÓÎÏ·½áÊø¶Ô»°¿òÏÂ°´·µ»Ø¼ü£¬ÊÓÎªÑ¡Ôñ"ÖØĞÂ¿ªÊ¼"ÓÎÏ·
-									bulletArray.clear();
-									enemyArray.clear();
-									playerX=screenWidth/2-playerBitmapWidth/2;
-									playerY=screenHeight-playerBitmapHeight;
-									createBulletTime=createCloudTime=createEnemyLTime=createEnemyMTime=
-										createEnemyTime=System.currentTimeMillis();
-									score=0;
-									isPaused=false;
-									dialog.dismiss();
-									
-								}
-								return false;
-							}
-		    				
-		    			}).show();
-					}});
-    			return true;
-    		}
-    	}
-    	return false;
+                            @Override
+                            public boolean onKey(DialogInterface dialog,
+                                    int keyCode, KeyEvent event) {
+                                switch(keyCode){
+                                case KeyEvent.KEYCODE_BACK:
+                                    //åœ¨æ¸¸æˆç»“æŸå¯¹è¯æ¡†ä¸‹æŒ‰è¿”å›é”®ï¼Œè§†ä¸ºé€‰æ‹©"é‡æ–°å¼€å§‹"æ¸¸æˆ
+                                    bulletArray.clear();
+                                    enemyArray.clear();
+                                    playerX=screenWidth/2-playerBitmapWidth/2;
+                                    playerY=screenHeight-playerBitmapHeight;
+                                    createBulletTime=createCloudTime=createEnemyLTime=createEnemyMTime=
+                                        createEnemyTime=System.currentTimeMillis();
+                                    score=0;
+                                    isPaused=false;
+                                    dialog.dismiss();
+                                    
+                                }
+                                return false;
+                            }
+                            
+                        }).show();
+                    }});
+                return true;
+            }
+        }
+        return false;
     }
     
     
-    //´¥ÆÁÊÂ¼ş
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		
-		switch(event.getAction()){
-		case MotionEvent.ACTION_DOWN:
-			eventX=(int)event.getX();
-			eventY=(int)event.getY();
-			//Èô´¥ÆÁ½Ó´¥µãµÄ×ø±êÔÚÍæ¼Ò·É»úÍ¼µÄ·¶Î§ÄÚ£¬ÔòËø¶¨Íæ¼Ò·É»ú
-			/*if(eventX>=playerX&&eventX<=playerX+playerBitmapWidth&&
-			eventY>=playerY&&eventY<=playerY+playerBitmapHeight){	*/		
-				isPlayerLocked=true;
-			//}
-			break;
-		case MotionEvent.ACTION_MOVE:
-			//ÔÚÍæ¼Ò·É»úËø¶¨µÄÇé¿öÏÂ£¬ËæÊ±¼ÇÂ¼´¥ÆÁ½Ó´¥µãµÄÎ»ÒÆ£¬ÒÔÍ¬²½µ½Íæ¼Ò·É»úµÄÎ»ÒÆ
-			if(isPlayerLocked){
-				int moveEventX=(int)event.getX();
-				int moveEventY=(int)event.getY();
-				dx+=moveEventX-eventX;
-				dy+=moveEventY-eventY;
-				eventX=moveEventX;
-				eventY=moveEventY;
-			}
-			break;
-		case MotionEvent.ACTION_UP:
-			dx=0;
-			dy=0;
-			//½âËøÍæ¼Ò·É»ú
-			isPlayerLocked=false;
-			break;
-		}	
-		return super.onTouchEvent(event);
-	}
-	
+    //è§¦å±äº‹ä»¶
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        
+        switch(event.getAction()){
+        case MotionEvent.ACTION_DOWN:
+            eventX=(int)event.getX();
+            eventY=(int)event.getY();
+            //è‹¥è§¦å±æ¥è§¦ç‚¹çš„åæ ‡åœ¨ç©å®¶é£æœºå›¾çš„èŒƒå›´å†…ï¼Œåˆ™é”å®šç©å®¶é£æœº
+            /*if(eventX>=playerX&&eventX<=playerX+playerBitmapWidth&&
+            eventY>=playerY&&eventY<=playerY+playerBitmapHeight){   */      
+                isPlayerLocked=true;
+            //}
+            break;
+        case MotionEvent.ACTION_MOVE:
+            //åœ¨ç©å®¶é£æœºé”å®šçš„æƒ…å†µä¸‹ï¼Œéšæ—¶è®°å½•è§¦å±æ¥è§¦ç‚¹çš„ä½ç§»ï¼Œä»¥åŒæ­¥åˆ°ç©å®¶é£æœºçš„ä½ç§»
+            if(isPlayerLocked){
+                int moveEventX=(int)event.getX();
+                int moveEventY=(int)event.getY();
+                dx+=moveEventX-eventX;
+                dy+=moveEventY-eventY;
+                eventX=moveEventX;
+                eventY=moveEventY;
+            }
+            break;
+        case MotionEvent.ACTION_UP:
+            dx=0;
+            dy=0;
+            //è§£é”ç©å®¶é£æœº
+            isPlayerLocked=false;
+            break;
+        }   
+        return super.onTouchEvent(event);
+    }
+    
 
-	@Override
-	protected void onPause() {
-		//°´Home¼üÍË³öÊ±µ÷ÓÃ£¬½áÊø»æÍ¼Ïß³ÌÑ­»·
-		System.out.println("onPause");
-		flag=false;
-		super.onPause();
-	}
+    @Override
+    protected void onPause() {
+        //æŒ‰Homeé”®é€€å‡ºæ—¶è°ƒç”¨ï¼Œç»“æŸç»˜å›¾çº¿ç¨‹å¾ªç¯
+        System.out.println("onPause");
+        flag=false;
+        super.onPause();
+    }
 
-	
-	@Override
-	protected void onResume() {
-		//°´Home¼ü»Ö¸´³ÌĞòÊ±£¬¿ªÆô»æÍ¼Ïß³ÌÑ­»·
-		System.out.println("onResume");
-		flag=true;
-		super.onResume();
-	}
+    
+    @Override
+    protected void onResume() {
+        //æŒ‰Homeé”®æ¢å¤ç¨‹åºæ—¶ï¼Œå¼€å¯ç»˜å›¾çº¿ç¨‹å¾ªç¯
+        System.out.println("onResume");
+        flag=true;
+        super.onResume();
+    }
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		switch(keyCode){
-		case KeyEvent.KEYCODE_BACK:
-			//ÔÚÓÎÏ·×÷Õ½Ò³Ãæ°´·µ»Ø¼ü£¬ÓÎÏ·ÔİÍ££¬²¢µ¯³ö¶Ô»°¿ò
-			isPaused=true;
-			handler.post(new Runnable(){
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch(keyCode){
+        case KeyEvent.KEYCODE_BACK:
+            //åœ¨æ¸¸æˆä½œæˆ˜é¡µé¢æŒ‰è¿”å›é”®ï¼Œæ¸¸æˆæš‚åœï¼Œå¹¶å¼¹å‡ºå¯¹è¯æ¡†
+            isPaused=true;
+            handler.post(new Runnable(){
 
-				@Override
-				public void run() {
-					new AlertDialog.Builder(PlaneBattleActivity.this).setTitle("ÓÎÏ·ÔİÍ£").setMessage("ÊÇ·ñ¼ÌĞøÓÎÏ·£¿")
-					.setCancelable(false)
-	    			.setPositiveButton("ÊÇ", new OnClickListener(){
-	
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							isPaused=false;	
-						}
-	    				
-	    			}).setNegativeButton("ÍË³ö", new OnClickListener(){
-	
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							PlaneBattleActivity.this.finish();
-						}
-	    				
-	    			}).setOnKeyListener(new OnKeyListener(){
+                @Override
+                public void run() {
+                    new AlertDialog.Builder(PlaneBattleActivity.this).setTitle("æ¸¸æˆæš‚åœ").setMessage("æ˜¯å¦ç»§ç»­æ¸¸æˆï¼Ÿ")
+                    .setCancelable(false)
+                    .setPositiveButton("æ˜¯", new OnClickListener(){
+    
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            isPaused=false; 
+                        }
+                        
+                    }).setNegativeButton("é€€å‡º", new OnClickListener(){
+    
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            PlaneBattleActivity.this.finish();
+                        }
+                        
+                    }).setOnKeyListener(new OnKeyListener(){
 
-						@Override
-						public boolean onKey(DialogInterface dialog,
-								int keyCode, KeyEvent event) {
-							//ÔÚÓÎÏ·ÔİÍ£¶Ô»°¿òÏÂ°´·µ»Ø¼ü£¬ÊÓÎªÑ¡Ôñ"¼ÌĞø"ÓÎÏ·
-							switch(keyCode){
-							case KeyEvent.KEYCODE_BACK:
-								if(event.getAction()==KeyEvent.ACTION_DOWN){
-									dialog.dismiss();
-									isPaused=false;
-								}
-							}
-							return false;
-						}
-	    				
-	    			}).show();
-				}				
-			});
-			return false;
-		};
-		return false;
-		
-	}
-	
-	
+                        @Override
+                        public boolean onKey(DialogInterface dialog,
+                                int keyCode, KeyEvent event) {
+                            //åœ¨æ¸¸æˆæš‚åœå¯¹è¯æ¡†ä¸‹æŒ‰è¿”å›é”®ï¼Œè§†ä¸ºé€‰æ‹©"ç»§ç»­"æ¸¸æˆ
+                            switch(keyCode){
+                            case KeyEvent.KEYCODE_BACK:
+                                if(event.getAction()==KeyEvent.ACTION_DOWN){
+                                    dialog.dismiss();
+                                    isPaused=false;
+                                }
+                            }
+                            return false;
+                        }
+                        
+                    }).show();
+                }               
+            });
+            return false;
+        };
+        return false;
+        
+    }
+    
+    
 
 }

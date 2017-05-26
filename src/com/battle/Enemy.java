@@ -5,91 +5,91 @@ import java.util.Random;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-//µĞ»úÀà
+//æ•Œæœºç±»
 public class Enemy {
-	private int enemyX;          //µĞ»ú×ø±ê
-	private int enemyY;
-	private Bitmap enemyBitmap;  //µĞ»úÍ¼
-	private int enemySpeed;      //µĞ»úÒÆ¶¯ËÙ¶È
-	private int blood;           //µĞ»úÑªÁ¿
-	private int type;            //µĞ»úÖÖÀà£¬Ä¿Ç°ÓĞĞ¡ĞÍ¡¢ÖĞĞÍ¡¢´óĞÍ3ÖÖ
-	private int score;           //»÷ÂäµĞ»úËùµÃµÄ·ÖÊı
-	
-	Enemy(Bitmap enemyBitmap,int enemyX,int enemyY,int type){
-		this.enemyBitmap=enemyBitmap;
-		this.enemyX=enemyX;
-		this.enemyY=enemyY;
-		this.type=type;
-		Random r=new Random();
-		switch(type){
-		case 0:
-			blood=1;
-			enemySpeed=r.nextInt(3)+5;
-			score=100;
-			break;
-		case 1:
-			blood=3;
-			enemySpeed=r.nextInt(3)+3;
-			score=500;
-			break;
-		case 2:
-			blood=10;
-			enemySpeed=3;
-			score=1500;
-			break;
-		}
-	}
-	
-	//»æÖÆµĞ»ú
-	public void drawEnemy(Canvas canvas){
-		canvas.drawBitmap(enemyBitmap, enemyX, enemyY, null);
-	}
-	
-	//ÒÆ¶¯µĞ»ú
-	public void moveEnemy(){
-		enemyY+=enemySpeed;
-	}
-	
-	//»÷ÖĞµĞ»ú
-	public boolean hitEnemy(){
-		if(--blood<=0)return true;
-		return false;
-	}
-	
-	//»ñÈ¡µĞ»úÖÖÀà
-	public int getType(){
-		return type;
-	}
-	
-	//»ñÈ¡µĞ»úºá×ø±ê
-	public int getEnemyX(){
-		return enemyX;
-	}
+    private int enemyX;          //æ•Œæœºåæ ‡
+    private int enemyY;
+    private Bitmap enemyBitmap;  //æ•Œæœºå›¾
+    private int enemySpeed;      //æ•Œæœºç§»åŠ¨é€Ÿåº¦
+    private int blood;           //æ•Œæœºè¡€é‡
+    private int type;            //æ•Œæœºç§ç±»ï¼Œç›®å‰æœ‰å°å‹ã€ä¸­å‹ã€å¤§å‹3ç§
+    private int score;           //å‡»è½æ•Œæœºæ‰€å¾—çš„åˆ†æ•°
+    
+    Enemy(Bitmap enemyBitmap,int enemyX,int enemyY,int type){
+        this.enemyBitmap=enemyBitmap;
+        this.enemyX=enemyX;
+        this.enemyY=enemyY;
+        this.type=type;
+        Random r=new Random();
+        switch(type){
+        case 0:
+            blood=1;
+            enemySpeed=r.nextInt(3)+5;
+            score=100;
+            break;
+        case 1:
+            blood=3;
+            enemySpeed=r.nextInt(3)+3;
+            score=500;
+            break;
+        case 2:
+            blood=10;
+            enemySpeed=3;
+            score=1500;
+            break;
+        }
+    }
+    
+    //ç»˜åˆ¶æ•Œæœº
+    public void drawEnemy(Canvas canvas){
+        canvas.drawBitmap(enemyBitmap, enemyX, enemyY, null);
+    }
+    
+    //ç§»åŠ¨æ•Œæœº
+    public void moveEnemy(){
+        enemyY+=enemySpeed;
+    }
+    
+    //å‡»ä¸­æ•Œæœº
+    public boolean hitEnemy(){
+        if(--blood<=0)return true;
+        return false;
+    }
+    
+    //è·å–æ•Œæœºç§ç±»
+    public int getType(){
+        return type;
+    }
+    
+    //è·å–æ•Œæœºæ¨ªåæ ‡
+    public int getEnemyX(){
+        return enemyX;
+    }
 
-	//»ñÈ¡µĞ»ú×İ×ø±ê
-	public int getEnemyY(){
-		return enemyY;
-	}
-	
-	//»ñÈ¡µĞ»úÒÆ¶¯ËÙ¶È
-	public int getEnemySpeed(){
-		return enemySpeed;
-	}
-	
-	//»ñÈ¡µĞ»úÍ¼¿í
-	public int getEnemyBimmapWidth(){
-		return enemyBitmap.getWidth();
-	}
-	
-	//»ñÈ¡µĞ»úÍ¼¸ß
-	public int getEnemyBitmaoHeight(){
-		return enemyBitmap.getHeight();
-	}
-	
-	//»ñÈ¡»÷ÂäµĞ»úËùµÃ·ÖÊı
-	public int getScore(){
-		return score;
-	}
-	
+    //è·å–æ•Œæœºçºµåæ ‡
+    public int getEnemyY(){
+        return enemyY;
+    }
+    
+    //è·å–æ•Œæœºç§»åŠ¨é€Ÿåº¦
+    public int getEnemySpeed(){
+        return enemySpeed;
+    }
+    
+    //è·å–æ•Œæœºå›¾å®½
+    public int getEnemyBimmapWidth(){
+        return enemyBitmap.getWidth();
+    }
+    
+    //è·å–æ•Œæœºå›¾é«˜
+    public int getEnemyBitmaoHeight(){
+        return enemyBitmap.getHeight();
+    }
+    
+    //è·å–å‡»è½æ•Œæœºæ‰€å¾—åˆ†æ•°
+    public int getScore(){
+        return score;
+    }
+    
 }
 

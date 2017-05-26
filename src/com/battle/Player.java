@@ -3,15 +3,15 @@ package com.battle;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-//Íæ¼Ò·É»úÀà
+//çŽ©å®¶é£žæœºç±»
 public class Player {
-	private Bitmap playerBitmap;    //·É»úÍ¼
-	
-	Player(Bitmap bitmap){this.playerBitmap=bitmap;}
-	
-	//»æÖÆÍæ¼Ò·É»ú
-	public void drawPlayer(Canvas canvas,int playerX,int playerY){
-		canvas.drawBitmap(playerBitmap, playerX, playerY, null);
-	}
-	
+    private Bitmap playerBitmap;    //é£žæœºå›¾
+    
+    Player(Bitmap bitmap){this.playerBitmap=bitmap;}
+    
+    //ç»˜åˆ¶çŽ©å®¶é£žæœº
+    public void drawPlayer(Canvas canvas,int playerX,int playerY){
+        canvas.drawBitmap(playerBitmap, playerX, playerY, null);
+    }
+    
 }

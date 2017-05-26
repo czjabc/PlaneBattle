@@ -4,34 +4,34 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 public class Bullet {
-	private int bulletX;            //Õ¨µ¯×ø±ê
-	private int bulletY;
-	private Bitmap bulletBitmap;    //Õ¨µ¯Í¼ 
-	private int bulletSpeed=15;     //Õ¨µ¯ÒÆ¶¯ËÙ¶È
-	
-	Bullet(Bitmap bulletBitmap,int bulletX,int bulletY){
-		this.bulletBitmap=bulletBitmap;
-		this.bulletX=bulletX;
-		this.bulletY=bulletY;
-	}
-	
-	//»æÖÆÕ¨µ¯
-	public void drawBullet(Canvas canvas){
-		canvas.drawBitmap(bulletBitmap, bulletX, bulletY, null);
-	}
-	
-	//ÒÆ¶¯Õ¨µ¯
-	public void moveBullet(){
-		bulletY-=bulletSpeed;
-	}
+    private int bulletX;            //ç‚¸å¼¹åæ ‡
+    private int bulletY;
+    private Bitmap bulletBitmap;    //ç‚¸å¼¹å›¾ 
+    private int bulletSpeed=15;     //ç‚¸å¼¹ç§»åŠ¨é€Ÿåº¦
+    
+    Bullet(Bitmap bulletBitmap,int bulletX,int bulletY){
+        this.bulletBitmap=bulletBitmap;
+        this.bulletX=bulletX;
+        this.bulletY=bulletY;
+    }
+    
+    //ç»˜åˆ¶ç‚¸å¼¹
+    public void drawBullet(Canvas canvas){
+        canvas.drawBitmap(bulletBitmap, bulletX, bulletY, null);
+    }
+    
+    //ç§»åŠ¨ç‚¸å¼¹
+    public void moveBullet(){
+        bulletY-=bulletSpeed;
+    }
 
-	//»ñÈ¡Õ¨µ¯ºá×ø±ê
-	public int getBulletX(){
-		return bulletX;
-	}
+    //è·å–ç‚¸å¼¹æ¨ªåæ ‡
+    public int getBulletX(){
+        return bulletX;
+    }
 
-	//»ñÈ¡Õ¨µ¯×İ×ø±ê
-	public int getBulletY(){
-		return bulletY;
-	}
+    //è·å–ç‚¸å¼¹çºµåæ ‡
+    public int getBulletY(){
+        return bulletY;
+    }
 }
